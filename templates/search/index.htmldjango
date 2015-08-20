@@ -1,0 +1,80 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Code for all of us!</title>
+        <link rel="stylesheet" href="{% static 'search/styles/main.css' %}" />
+    </head>
+    <body>
+        <div id="intro">
+        </div>
+        <section id="search-area">
+            <div id="text-search" class="row">
+                <div class="col-md-4 col-md-offset-4">
+                    <label for="searchbar"><i class="fa fa-search"></i></label>
+                    <input id="searchbar" class="form-control input-lg" type="search" placeholder="Search" />
+                    <button class="hidden"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div id="filters" class="col-md-12"></div>
+        </section>
+        <section id="results" class="row">
+            <section id="organizations" class="list-section col-md-4 col-lg-3 col-lg-offset-1">
+                <div class="list-title">
+                    <h2><i class="fa fa-globe"></i> Organizations</h1>
+                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="id">Remove Sorting</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="list-table table table-hover table-bordered">
+                        <thead class="sort-header">
+                            <tr>
+                                <td class="sort-key" data-sort-key="name">
+                                    Name
+                                    <i class="sort-icon sort-icon-ascending fa fa-caret-down"></i>
+                                    <i class="sort-icon sort-icon-descending fa fa-caret-up"></i>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody class="list"></tbody>
+                    </table>
+                </div>
+                <div class="empty-list-msg">There were no organizations that matched your search.</div>
+            </section>
+
+            <section id="projects" class="list-section col-md-8 col-lg-7">
+                <div class="list-title">
+                    <h2><i class="fa fa-code-fork"></i> Projects</h1>
+                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="id">Remove Sorting</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="list-table table table-hover table-bordered">
+                        <thead class="sort-header">
+                            <tr>
+                                <td class="sort-key" data-sort-key="organization.name">
+                                    Org
+                                    <i class="sort-icon sort-icon-ascending fa fa-caret-down"></i>
+                                    <i class="sort-icon sort-icon-descending fa fa-caret-up"></i>
+                                </td>
+                                <td class="sort-key" data-sort-key="name">
+                                    Name
+                                    <i class="sort-icon sort-icon-ascending fa fa-caret-down"></i>
+                                    <i class="sort-icon sort-icon-descending fa fa-caret-up"></i>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody class="list"></tbody>
+                    </table>
+                </div>
+                <div class="empty-list-msg">There were no projects that matched your search.</div>
+            </section>
+        </section>
+        <script src="{% static 'search/scripts/libs.js' %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static 'search/scripts/app.js' %}" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" charset="utf-8">
+            require('app').start();
+        </script>
+    </body>
+</html>

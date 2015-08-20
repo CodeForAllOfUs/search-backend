@@ -1,0 +1,15 @@
+{
+  "name": "codeforallof.us-server",
+  "version": "1.0.0",
+  "homepage": "http://codeforallof.us",
+  "description": "The code for the codeforallof.us website server.",
+  "private": true,
+  "author": "David Arvelo",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  }
+}
