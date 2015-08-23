@@ -25,7 +25,7 @@
             <section id="organizations" class="list-section col-md-4 col-lg-3 col-lg-offset-1">
                 <div class="list-title">
                     <h2><i class="fa fa-globe"></i> Organizations</h1>
-                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="id">Remove Sorting</button>
+                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="sortId">Remove Sorting</button>
                 </div>
                 <div class="table-responsive">
                     <table class="list-table table table-hover table-bordered">
@@ -47,7 +47,7 @@
             <section id="projects" class="list-section col-md-8 col-lg-7">
                 <div class="list-title">
                     <h2><i class="fa fa-code-fork"></i> Projects</h1>
-                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="id">Remove Sorting</button>
+                    <button class="remove-sort btn btn-sm btn-default" data-sort-key="sortId">Remove Sorting</button>
                 </div>
                 <div class="table-responsive">
                     <table class="list-table table table-hover table-bordered">
