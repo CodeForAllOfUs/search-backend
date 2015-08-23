@@ -47,14 +47,10 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     homepage = models.CharField(max_length=255)
-    github_url = models.CharField(max_length=255, unique=True)
-    github_data = models.ForeignKey(GithubCache)
-    organization = models.ForeignKey(Organization)
+    github_url = models.CharField(max_length=255, unique=True, null=True)
+    github_data = models.ForeignKey(GithubCache, null=True)
+    organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
-
-    # @TODO: project unique for organization?
-    # class Meta():
-    #     pass
 
     # Override save method to allow `github_url` to be unique and NULL (not present)
     # ref https://docs.djangoproject.com/en/1.8/topics/db/models/#overriding-model-methods
