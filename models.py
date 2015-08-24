@@ -40,6 +40,20 @@ class Organization(models.Model):
         self.github_url = self.github_url or None
         super(Organization, self).save(*args, **kwargs)
 
+    def toJSON(self):
+        ret = {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'homepage': self.homepage,
+            'categories': [cat.name for cat in self.categories.all()],
+        }
+
+        if self.github_url:
+            ret['github_url'] = self.github_url
+
+        return ret
+
     def __str__(self):
         return self.name
 
@@ -57,6 +71,24 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         self.github_url = self.github_url or None
         super(Project, self).save(*args, **kwargs)
+
+    def toJSON(self):
+        ret = {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'homepage': self.homepage,
+            'tags': [tag.name for tag in self.tags.all()],
+        }
+
+        if self.github_url:
+            ret['github_url'] = self.github_url
+
+        if self.organization:
+            print(self.organization)
+            ret['organizationId'] = self.organization.id
+
+        return ret
 
     def __str__(self):
         return self.name
