@@ -14,7 +14,7 @@ class Category(models.Model):
         return self.name
 
 class GithubCache(models.Model):
-    github_url = models.CharField(max_length=255, unique=True)
+    github_url = models.URLField(max_length=255, unique=True)
     fetched = models.DateTimeField('time fetched', default=timezone.now)
     json = models.TextField()
 
@@ -30,8 +30,8 @@ class GithubCache(models.Model):
 class Organization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
-    homepage = models.CharField(max_length=255)
-    github_url = models.CharField(max_length=255, unique=True, null=True)
+    homepage = models.URLField(max_length=255)
+    github_url = models.URLField(max_length=255, unique=True, null=True)
     categories = models.ManyToManyField(Category)
 
     # Override save method to allow `github_url` to be unique and NULL (not present)
@@ -46,8 +46,8 @@ class Organization(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    homepage = models.CharField(max_length=255)
-    github_url = models.CharField(max_length=255, unique=True, null=True)
+    homepage = models.URLField(max_length=255)
+    github_url = models.URLField(max_length=255, unique=True, null=True)
     github_data = models.ForeignKey(GithubCache, null=True)
     organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
