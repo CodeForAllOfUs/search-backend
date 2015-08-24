@@ -1,5 +1,11 @@
+import json
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
 def index(request):
-    return render(request, 'search/index.htmldjango')
+    context = {}
+
+    if 'query' in request.GET:
+        context['search_query'] = request.GET['query']
+
+    return render(request, 'search/index.htmldjango', context)

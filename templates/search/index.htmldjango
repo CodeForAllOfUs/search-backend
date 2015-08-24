@@ -15,7 +15,7 @@
             <div id="text-search" class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <label for="searchbar"><i class="fa fa-search"></i></label>
-                    <input id="searchbar" class="form-control input-lg" type="search" placeholder="Search" />
+                    <input id="searchbar" class="form-control input-lg" type="search" placeholder="Search" {% if search_query %}value="{{search_query}}"{% endif %} />
                     <button class="hidden"><i class="fa fa-times"></i></button>
                 </div>
             </div>
