@@ -39,9 +39,9 @@ def fill_organizations():
             org = Organization()
 
         # update properties
-        org.name = o['name'],
-        org.description = o['description'],
-        org.homepage    = o.get('homepage', ''),
+        org.name = o['name']
+        org.description = o['description']
+        org.homepage    = o.get('homepage', '')
         org.github_url  = o.get('github_url', '')
 
         # save org before we start modifying its ManyToManyField
@@ -60,9 +60,9 @@ def fill_projects():
             proj = Project()
 
         # update properties
-        proj.name = p['name'],
-        proj.description = p['description'],
-        proj.homepage    = p.get('homepage', ''),
+        proj.name = p['name']
+        proj.description = p['description']
+        proj.homepage    = p.get('homepage', '')
         proj.github_url  = p.get('github_url', '')
 
         if p['organizationId']:
