@@ -79,7 +79,6 @@ class Project(models.Model):
             ret['github'] = self.github
 
         if self.organization:
-            print(self.organization)
             ret['organizationId'] = self.organization.id
 
         return ret
