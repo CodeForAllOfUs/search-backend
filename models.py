@@ -19,6 +19,12 @@ class GitHubCache(models.Model):
     fetched = models.DateTimeField('time fetched', default=timezone.now)
     json = models.TextField()
 
+    def toJSON(self):
+        return {
+            'github_path': self.github_path,
+            'data': json.loads(self.json),
+        }
+
     def __str__(self):
         return self.github_path
 
