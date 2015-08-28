@@ -14,47 +14,48 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('name', models.CharField(unique=True, max_length=255)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
+                ('name', models.CharField(max_length=255, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='GithubCache',
+            name='GitHubCache',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('github', models.CharField(unique=True, max_length=255)),
-                ('fetched', models.DateTimeField(default=django.utils.timezone.now, verbose_name='time fetched')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
+                ('github_path', models.CharField(max_length=255, unique=True)),
+                ('fetched', models.DateTimeField(verbose_name='time fetched', default=django.utils.timezone.now)),
                 ('json', models.TextField()),
             ],
         ),
         migrations.CreateModel(
             name='Organization',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('name', models.CharField(unique=True, max_length=255)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
+                ('name', models.CharField(max_length=255, unique=True)),
                 ('description', models.TextField()),
                 ('homepage', models.URLField(max_length=255)),
-                ('github', models.CharField(null=True, unique=True, max_length=255)),
+                ('github_path', models.CharField(max_length=255, null=True, unique=True)),
                 ('categories', models.ManyToManyField(to='search.Category')),
+                ('github_data', models.ForeignKey(null=True, to='search.GitHubCache')),
             ],
         ),
         migrations.CreateModel(
             name='Project',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.TextField()),
                 ('homepage', models.URLField(max_length=255)),
-                ('github', models.CharField(null=True, unique=True, max_length=255)),
-                ('github_data', models.ForeignKey(null=True, to='search.GithubCache')),
+                ('github_path', models.CharField(max_length=255, null=True, unique=True)),
+                ('github_data', models.ForeignKey(null=True, to='search.GitHubCache')),
                 ('organization', models.ForeignKey(null=True, to='search.Organization')),
             ],
         ),
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('name', models.CharField(unique=True, max_length=255)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
+                ('name', models.CharField(max_length=255, unique=True)),
             ],
         ),
         migrations.AddField(

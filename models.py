@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django.utils import timezone
 
@@ -13,25 +14,26 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class GithubCache(models.Model):
-    github = models.CharField(max_length=255, unique=True, blank=False, null=False)
+class GitHubCache(models.Model):
+    github_path = models.CharField(max_length=255, unique=True, blank=False, null=False)
     fetched = models.DateTimeField('time fetched', default=timezone.now)
     json = models.TextField()
 
     def __str__(self):
-        return self.github
+        return self.github_path
 
 class Organization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     homepage = models.URLField(max_length=255)
-    github = models.CharField(max_length=255, unique=True, null=True)
+    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_data = models.ForeignKey(GitHubCache, null=True)
     categories = models.ManyToManyField(Category)
 
-    # Override save method to allow `github` to be unique and NULL (not present)
+    # Override save method to allow `github_path` to be unique and NULL (not present)
     # ref https://docs.djangoproject.com/en/1.8/topics/db/models/#overriding-model-methods
     def save(self, *args, **kwargs):
-        self.github = self.github or None
+        self.github_path = self.github_path or None
         super(Organization, self).save(*args, **kwargs)
 
     def toJSON(self):
@@ -43,8 +45,8 @@ class Organization(models.Model):
             'categories': [cat.name for cat in self.categories.all()],
         }
 
-        if self.github:
-            ret['github'] = self.github
+        if self.github_path:
+            ret['github_path'] = self.github_path
 
         return ret
 
@@ -55,15 +57,15 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     homepage = models.URLField(max_length=255)
-    github = models.CharField(max_length=255, unique=True, null=True)
-    github_data = models.ForeignKey(GithubCache, null=True)
+    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_data = models.ForeignKey(GitHubCache, null=True)
     organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
 
-    # Override save method to allow `github` to be unique and NULL (not present)
+    # Override save method to allow `github_path` to be unique and NULL (not present)
     # ref https://docs.djangoproject.com/en/1.8/topics/db/models/#overriding-model-methods
     def save(self, *args, **kwargs):
-        self.github = self.github or None
+        self.github_path = self.github_path or None
         super(Project, self).save(*args, **kwargs)
 
     def toJSON(self):
@@ -75,8 +77,8 @@ class Project(models.Model):
             'tags': [tag.name for tag in self.tags.all()],
         }
 
-        if self.github:
-            ret['github'] = self.github
+        if self.github_path:
+            ret['github_path'] = self.github_path
 
         if self.organization:
             ret['organizationId'] = self.organization.id

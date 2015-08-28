@@ -33,7 +33,7 @@ json_loader.fill_models(
         'name',
         'description',
         {'name': 'homepage',   'default': ''},
-        {'name': 'github', 'default': ''},
+        {'name': 'github_path', 'default': ''},
         {'name': 'categories', 'many_to_many': True, 'manager': Category, 'map_field': 'name'}
     ),
 )
@@ -45,7 +45,7 @@ json_loader.fill_models(
         'name',
         'description',
         {'name': 'homepage',   'default': ''},
-        {'name': 'github', 'default': ''},
+        {'name': 'github_path', 'default': ''},
         {'name': 'tags', 'many_to_many': True, 'manager': Tag, 'map_field': 'name'},
         {'name': 'organization', 'foreign_key': True, 'manager': Organization, 'json_key': 'organizationId'}
     ),
