@@ -34,10 +34,10 @@ def fill_models(manager, pk, json, attrs):
 
         # update properties
         for attr in attrs:
-            if type(attr) == str:
+            if isinstance(attr, str):
                 normal_attrs.append(attr)
 
-            if type(attr) == dict:
+            if isinstance(attr, dict):
                 if 'default' in attr:
                     default_attrs.append(attr)
                 elif 'foreign_key' in attr:
