@@ -2,22 +2,54 @@ import json
 from django.db import models
 from django.utils import timezone
 
-class Tag(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+class NamedAttribute(models.Model):
+    name = models.CharField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         return self.name
 
-class Category(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+class Category(NamedAttribute):
+    class Meta:
+        verbose_name_plural = 'categories'
 
-    def __str__(self):
-        return self.name
+class Tag(NamedAttribute):
+    pass
+
+class ProgrammingLanguage(NamedAttribute):
+    pass
+
+class License(NamedAttribute):
+    pass
 
 class GitHubCache(models.Model):
-    github_path = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    github_path = models.CharField(max_length=255, unique=True, blank=False, null=False, db_index=True)
     fetched = models.DateTimeField('time fetched', default=timezone.now)
     json = models.TextField()
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.github_path
+
+class GitHubOrganizationCache(GitHubCache):
+    def toJSON(self):
+        return {
+            'github_path': self.github_path,
+            'data': json.loads(self.json),
+        }
+
+class GitHubProjectCache(GitHubCache):
+    open_issues_count = models.IntegerField(db_index=True)
+    stargazers_count = models.IntegerField(db_index=True)
+    last_commit = models.DateTimeField('last commit date', db_index=True)
+    language = models.ForeignKey(ProgrammingLanguage, null=True)
+
+    class Meta:
+        get_latest_by = 'last_commit'
 
     def toJSON(self):
         return {
@@ -25,16 +57,13 @@ class GitHubCache(models.Model):
             'data': json.loads(self.json),
         }
 
-    def __str__(self):
-        return self.github_path
-
 class Organization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     homepage = models.URLField(max_length=255)
-    github_path = models.CharField(max_length=255, unique=True, null=True)
-    github_data = models.ForeignKey(GitHubCache, null=True)
     categories = models.ManyToManyField(Category)
+    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_data = models.ForeignKey(GitHubOrganizationCache, null=True)
 
     # Override save method to allow `github_path` to be unique and NULL (not present)
     # ref https://docs.djangoproject.com/en/1.8/topics/db/models/#overriding-model-methods
@@ -63,10 +92,11 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     homepage = models.URLField(max_length=255)
-    github_path = models.CharField(max_length=255, unique=True, null=True)
-    github_data = models.ForeignKey(GitHubCache, null=True)
+    license = models.ForeignKey(License)
     organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
+    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_data = models.ForeignKey(GitHubProjectCache, null=True)
 
     # Override save method to allow `github_path` to be unique and NULL (not present)
     # ref https://docs.djangoproject.com/en/1.8/topics/db/models/#overriding-model-methods
@@ -80,6 +110,7 @@ class Project(models.Model):
             'name': self.name,
             'description': self.description,
             'homepage': self.homepage,
+            'license': self.license,
             'tags': [tag.name for tag in self.tags.all()],
         }
 
