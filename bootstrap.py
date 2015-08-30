@@ -25,6 +25,12 @@ json_loader.fill_auxiliary(
     json=projects_json,
     json_key='tags'
 )
+json_loader.fill_auxiliary(
+    manager=License,
+    field='name',
+    json=projects_json,
+    json_key='license'
+)
 json_loader.fill_models(
     manager=Organization,
     pk='id',
@@ -33,8 +39,8 @@ json_loader.fill_models(
         'name',
         'description',
         {'name': 'homepage',   'default': ''},
+        {'name': 'categories', 'many_to_many': True, 'manager': Category, 'map_field': 'name'},
         {'name': 'github_path', 'default': ''},
-        {'name': 'categories', 'many_to_many': True, 'manager': Category, 'map_field': 'name'}
     ),
 )
 json_loader.fill_models(
@@ -45,8 +51,9 @@ json_loader.fill_models(
         'name',
         'description',
         {'name': 'homepage',   'default': ''},
-        {'name': 'github_path', 'default': ''},
+        {'name': 'license', 'foreign_key_unique_name': True, 'manager': License, 'json_key': 'license'},
+        {'name': 'organization', 'foreign_key_id': True, 'manager': Organization, 'json_key': 'organizationId'},
         {'name': 'tags', 'many_to_many': True, 'manager': Tag, 'map_field': 'name'},
-        {'name': 'organization', 'foreign_key': True, 'manager': Organization, 'json_key': 'organizationId'}
+        {'name': 'github_path', 'default': ''},
     ),
 )

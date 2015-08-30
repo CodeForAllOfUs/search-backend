@@ -2,11 +2,24 @@ def fill_auxiliary(manager, field, json, json_key):
     """
     gather all categories/tags, then fill the database with any new ones
     """
+    def normalize_keyval(obj, key):
+        """
+        normally the attrs we want are lists, but sometimes they're strings.
+        in those cases we need to make sure we don't iterate over the chars,
+        and instead use the string whole by placing it into an iterable.
+        """
+        attr = obj[key]
+
+        if isinstance(attr, str):
+            attr = [attr]
+
+        return attr
+
     saved = set(getattr(o, field) for o in manager.objects.all())
     unsaved = set()
 
     for obj in json:
-        unsaved.update(obj[json_key])
+        unsaved.update(normalize_keyval(obj, json_key))
 
     # get a set of all models not yet saved
     unsaved = unsaved - saved
@@ -29,7 +42,8 @@ def fill_models(manager, pk, json, attrs):
 
         normal_attrs = []
         default_attrs = []
-        foreign_key_attrs = []
+        foreign_key_id_attrs = []
+        foreign_key_unique_name_attrs = []
         many_to_many_attrs = []
 
         # update properties
@@ -40,8 +54,10 @@ def fill_models(manager, pk, json, attrs):
             if isinstance(attr, dict):
                 if 'default' in attr:
                     default_attrs.append(attr)
-                elif 'foreign_key' in attr:
-                    foreign_key_attrs.append(attr)
+                elif 'foreign_key_id' in attr:
+                    foreign_key_id_attrs.append(attr)
+                elif 'foreign_key_unique_name' in attr:
+                    foreign_key_unique_name_attrs.append(attr)
                 elif 'many_to_many' in attr:
                     many_to_many_attrs.append(attr)
 
@@ -51,12 +67,19 @@ def fill_models(manager, pk, json, attrs):
         for attr in default_attrs:
             setattr(model, attr['name'], obj.get(attr['name'], attr['default']))
 
-        for attr in foreign_key_attrs:
+        for attr in foreign_key_id_attrs:
             name = attr['name']
             json_key = attr['json_key']
             foreign_manager = attr['manager']
             if obj[json_key]:
                 setattr(model, name, foreign_manager.objects.get(pk=obj[json_key]))
+
+        for attr in foreign_key_unique_name_attrs:
+            name = attr['name']
+            json_key = attr['json_key']
+            foreign_manager = attr['manager']
+            if obj[json_key]:
+                setattr(model, name, foreign_manager.objects.get(name=obj[json_key]))
 
         # save model before we start modifying its ManyToManyFields
         # ref: https://docs.djangoproject.com/en/1.8/topics/db/examples/many_to_many/
