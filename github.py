@@ -1,10 +1,16 @@
 import json
+import itertools
 import requests
 import arrow
 from queue import PriorityQueue
-from urllib.request import urlopen
 from threading import Thread, Timer
+from urllib.request import urlopen
+
 from .models import Organization, Project, GitHubOrganizationCache, GitHubProjectCache, ProgrammingLanguage
+
+# tie-breaker for priority queue, ensures that
+# tasks are popped from the queue in insertion order
+counter = itertools.count()
 
 class GitHubHeartbeat():
     priority_uncached = 0
@@ -67,7 +73,7 @@ class GitHubHeartbeat():
                 # it can be fetched on rotation in order to keep the data fresh
                 print('Queueing normal priority for url:', path)
                 self.queued[path] = priority_normal
-                self.queue.put((priority_normal, path))
+                self.queue.put((priority_normal, next(counter), path))
 
             current_priority = self.queued[path]
 
@@ -76,13 +82,13 @@ class GitHubHeartbeat():
             if item.github_data == None and current_priority > priority_uncached:
                 print('Queueing uncached priority for url:', path)
                 self.queued[path] = priority_uncached
-                self.queue.put((priority_uncached, path))
+                self.queue.put((priority_uncached, next(counter), path))
             # only queue items as user_requested once during the life of the server
             elif user_requested and self.queued[path] > priority_user_requested:
                 if item.github_data and (arrow.utcnow() - item.github_data.fetched).total_seconds() > stale_threshold:
                     print('Queueing user requested priority for url:', path)
                     self.queued[path] = priority_user_requested
-                    self.queue.put((priority_user_requested, path))
+                    self.queue.put((priority_user_requested, next(counter), path))
 
     def enqueue(self, manager, github_paths, data_type):
         """
@@ -221,12 +227,13 @@ class GitHubHeartbeat():
         if self.rate_limit['remaining'] <= 0:
             interval = self.rate_limit['time_left']
         else:
-            priority, github_path = self.queue.get()
+            priority, q_insertion_num, github_path = self.queue.get()
 
             # Spawn a thread to download the GitHub data for the item and store it in the database
             self.Downloader(self, github_path, priority).start()
 
-            # set timer for getting the next task
+            # set timer for getting the next task.
+            # keep q_insertion_num the same to keep sort order
             next_task = self.queue.get()
             next_priority = next_task[0]
             self.queue.put(next_task)
