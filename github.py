@@ -90,7 +90,7 @@ class GitHubHeartbeat():
         if isinstance(github_paths, str):
             github_paths = (github_paths,)
 
-        items = manager.objects.filter(github_path__in=github_paths)
+        items = manager.objects.filter(github_path__isnull=False, github_path__in=github_paths)
         self.queue_items(items, user_requested=True)
 
     def check_database(self):
