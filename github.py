@@ -19,7 +19,7 @@ class GitHubHeartbeat():
     interval_user_requested = 30
     @property
     def interval_normal(self):
-        return self.rate_limit['time_left'] / self.queue.qsize()
+        return min(self.rate_limit['time_left'] / (self.queue.qsize() or 1), 300)
 
     __rate_limit = None
 
