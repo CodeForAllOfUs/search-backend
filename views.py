@@ -5,10 +5,10 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.cache import cache_control
 
 from .models import Organization, Project
-# from .github import GitHubHeartbeat
+from .github import GitHubHeartbeat
 
-# gh_heartbeat = GitHubHeartbeat()
-# gh_heartbeat.start()
+gh_heartbeat = GitHubHeartbeat()
+gh_heartbeat.start()
 
 def index(request):
     try:
@@ -51,13 +51,12 @@ def github_data(request):
     cached_pathnames = set(item['github_path'] for item in cached_paths)
     to_queue = github_paths - cached_pathnames
 
-    # if to_queue:
-    #     gh_heartbeat.enqueue(manager, to_queue)
+    if to_queue:
+        gh_heartbeat.enqueue(manager, to_queue)
 
     rate_limit = {
         'remaining': gh_heartbeat.rate_limit['remaining'],
-        # use `Z` for client-side JavaScript consumption
-        'reset_date': gh_heartbeat.rate_limit['reset_date'].isoformat() + 'Z',
+        'reset_date': gh_heartbeat.rate_limit['reset_date'].isoformat(),
     }
 
     # only send data for the paths already in the cache since fetching the
