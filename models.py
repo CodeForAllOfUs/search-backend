@@ -1,4 +1,3 @@
-import json
 from django.db import models
 from django.utils import timezone
 
@@ -15,14 +14,9 @@ class Category(NamedAttribute):
     class Meta:
         verbose_name_plural = 'categories'
 
-class Tag(NamedAttribute):
-    pass
-
-class ProgrammingLanguage(NamedAttribute):
-    pass
-
-class License(NamedAttribute):
-    pass
+class Tag(NamedAttribute): pass
+class ProgrammingLanguage(NamedAttribute): pass
+class License(NamedAttribute): pass
 
 class GitHubCache(models.Model):
     github_path = models.CharField(max_length=255, unique=True, blank=False, null=False, db_index=True)
@@ -39,13 +33,12 @@ class GitHubOrganizationCache(GitHubCache):
     def toJSON(self):
         return {
             'github_path': self.github_path,
-            'data': json.loads(self.json),
         }
 
 class GitHubProjectCache(GitHubCache):
     open_issues_count = models.IntegerField(db_index=True)
     stargazers_count = models.IntegerField(db_index=True)
-    last_commit = models.DateTimeField('last commit date', db_index=True)
+    last_commit = models.DateTimeField('last commit date', null=True, db_index=True)
     language = models.ForeignKey(ProgrammingLanguage, null=True)
 
     class Meta:
@@ -54,7 +47,10 @@ class GitHubProjectCache(GitHubCache):
     def toJSON(self):
         return {
             'github_path': self.github_path,
-            'data': json.loads(self.json),
+            'open_issues_count': self.open_issues_count,
+            'stargazers_count': self.stargazers_count,
+            'last_commit': self.last_commit,
+            'language': self.language.name if self.language else None,
         }
 
 class Organization(models.Model):
@@ -62,7 +58,7 @@ class Organization(models.Model):
     description = models.TextField()
     homepage = models.URLField(max_length=255)
     categories = models.ManyToManyField(Category)
-    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_path = models.CharField(max_length=255, unique=True, blank=False, null=True)
     github_data = models.ForeignKey(GitHubOrganizationCache, null=True)
 
     # Override save method to allow `github_path` to be unique and NULL (not present)
@@ -95,7 +91,7 @@ class Project(models.Model):
     license = models.ForeignKey(License)
     organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
-    github_path = models.CharField(max_length=255, unique=True, null=True)
+    github_path = models.CharField(max_length=255, unique=True, blank=False, null=True)
     github_data = models.ForeignKey(GitHubProjectCache, null=True)
 
     # Override save method to allow `github_path` to be unique and NULL (not present)
@@ -110,7 +106,7 @@ class Project(models.Model):
             'name': self.name,
             'description': self.description,
             'homepage': self.homepage,
-            'license': self.license,
+            'license': self.license.name,
             'tags': [tag.name for tag in self.tags.all()],
         }
 
