@@ -52,18 +52,11 @@ class GitHubHeartbeat():
     def decrement_rate_limit_remaining(self):
         self.rate_limit['remaining'] -= 1
 
-    def queue_items(self, items, data_type, user_requested=False):
+    def queue_items(self, items, user_requested=False):
         priority_normal = self.priority_normal
         priority_uncached = self.priority_uncached
         priority_user_requested = self.priority_user_requested
         stale_threshold = self.stale_threshold
-
-        if data_type == 'org':
-            cache_manager = GitHubOrganizationCache
-        elif data_type == 'project':
-            cache_manager = GitHubProjectCache
-        else:
-            return
 
         for item in items:
             path = item.github_path
@@ -90,7 +83,7 @@ class GitHubHeartbeat():
                     self.queued[path] = priority_user_requested
                     self.queue.put((priority_user_requested, next(counter), path))
 
-    def enqueue(self, manager, github_paths, data_type):
+    def enqueue(self, manager, github_paths):
         """
         public interface for user-requested github paths through the API
         """
@@ -98,7 +91,7 @@ class GitHubHeartbeat():
             github_paths = (github_paths,)
 
         items = manager.objects.filter(github_path__in=github_paths)
-        self.queue_items(items, data_type, user_requested=True)
+        self.queue_items(items, user_requested=True)
 
     def check_database(self):
         """
@@ -107,8 +100,8 @@ class GitHubHeartbeat():
         orgs = Organization.objects.filter(github_path__isnull=False)
         projects = Project.objects.filter(github_path__isnull=False)
 
-        self.queue_items(orgs, data_type='org')
-        self.queue_items(projects, data_type='project')
+        self.queue_items(orgs)
+        self.queue_items(projects)
 
         self.check_database_timer = Timer(self.interval_check_database, self.check_database)
         self.check_database_timer.start()
