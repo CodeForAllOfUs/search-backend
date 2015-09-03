@@ -129,8 +129,7 @@ class GitHubHeartbeat():
             try:
                 model = manager.objects.get(github_path=self.github_path)
             except:
-                # If the model no longer exists, don't try to fetch it and don't requeue it
-                self.heartbeat.queue.task_done()
+                self.finish(errored=True)
                 return
 
             response = self.download_data(url)
@@ -151,7 +150,7 @@ class GitHubHeartbeat():
             if response.status_code != 404:
                 self.requeue()
 
-            self.heartbeat.queue.task_done()
+            self.finish()
 
         def download_data(self, url):
             print('Getting GitHub API url:', url, 'with priority', self.priority)
@@ -201,15 +200,19 @@ class GitHubHeartbeat():
             model.save()
 
         def requeue(self):
-            if self.priority < self.heartbeat.priority_normal:
+            # normal_priority task is automatically queued and requeued for all items.
+            # this keeps them on rotation so the cache data stays fresh.
+            # all other priorities are special requests that don't require a requeue.
+            if self.priority == self.heartbeat.priority_normal:
+                print('Requeueing path:', self.github_path)
+                self.heartbeat.queue.put((self.heartbeat.priority_normal, next(counter), self.github_path))
+
+        def finish(self, errored=False):
+            if not errored and self.priority != self.heartbeat.priority_normal:
                 # reset priority for that github_path in case it needs to be elevated again by a user request
                 self.heartbeat.queued[self.github_path] = self.heartbeat.priority_normal
-                # don't requeue because a normal_priority task is automatically queued for all items
-                return
 
-            # automatically requeue normal_priority items.
-            # this keeps them on rotation so the cache data stays fresh
-            self.queue.put((self.heartbeat.priority_normal, url))
+            self.heartbeat.queue.task_done()
 
     def fetch_next(self):
         """
