@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.cache import cache_control
 
-from .models import Organization, Project
+from .models import Organization, Project, GitHubOrganizationCache, GitHubProjectCache
 from .github import GitHubHeartbeat
 
 gh_heartbeat = GitHubHeartbeat()
@@ -39,9 +39,9 @@ def github_data(request):
         github_paths = set(parse_qs(request.GET.urlencode())['github_paths[]'])
 
         if manager == 'organizations':
-            manager = Organization
+            manager = GitHubOrganizationCache
         elif manager == 'projects':
-            manager = Project
+            manager = GitHubProjectCache
         else:
             raise Exception()
     except:
