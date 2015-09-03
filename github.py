@@ -133,9 +133,7 @@ class GitHubHeartbeat():
                 self.heartbeat.queue.task_done()
                 return
 
-            print('Getting GitHub API url:', url, 'with priority', self.priority)
-            self.heartbeat.decrement_rate_limit_remaining()
-            response = requests.get(url, headers=self.headers)
+            response = self.download_data(url)
 
             if response.status_code == 200:
                 if manager == Organization:
@@ -154,6 +152,11 @@ class GitHubHeartbeat():
                 self.requeue()
 
             self.heartbeat.queue.task_done()
+
+        def download_data(self, url):
+            print('Getting GitHub API url:', url, 'with priority', self.priority)
+            self.heartbeat.decrement_rate_limit_remaining()
+            return requests.get(url, headers=self.headers)
 
         def fill_org_data(self, model, response):
             try:
