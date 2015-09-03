@@ -37,7 +37,7 @@ class GitHubHeartbeat():
             self.__rate_limit = {
                 'limit':       data['limit'],
                 'remaining':   data['remaining'],
-                'reset_date':  arrow.get(data['reset']),
+                'reset_date':  arrow.get(data['reset']).replace(seconds=+5),
             }
 
         self.__rate_limit['time_left'] = (self.__rate_limit['reset_date'] - arrow.utcnow()).total_seconds()
@@ -218,6 +218,7 @@ class GitHubHeartbeat():
         pop the next github path from the queue and fetch it using the GitHub API
         """
         if self.rate_limit['remaining'] <= 0:
+            print('Rate Limit exhausted. Waiting until', self.rate_limit['reset_date'], 'seconds left:', self.rate_limit['time_left'])
             interval = self.rate_limit['time_left']
         else:
             priority, q_insertion_num, github_path = self.queue.get()
