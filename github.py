@@ -1,9 +1,9 @@
 import json
 import requests
+import arrow
 from queue import PriorityQueue
 from urllib.request import urlopen
 from threading import Thread, Timer
-from datetime import datetime, timezone
 from .models import Organization, Project, GitHubOrganizationCache, GitHubProjectCache, ProgrammingLanguage
 
 class GitHubHeartbeat():
@@ -25,16 +25,16 @@ class GitHubHeartbeat():
 
     @property
     def rate_limit(self):
-        if not self.__rate_limit or self.__rate_limit['reset_date'] < datetime.now():
+        if not self.__rate_limit or self.__rate_limit['reset_date'] < arrow.utcnow():
             data = urlopen('https://api.github.com/rate_limit').read().decode(encoding='UTF8')
             data = json.loads(data)['resources']['core']
             self.__rate_limit = {
                 'limit':       data['limit'],
                 'remaining':   data['remaining'],
-                'reset_date':  datetime.fromtimestamp(data['reset']),
+                'reset_date':  arrow.get(data['reset']),
             }
 
-        self.__rate_limit['time_left'] = (self.__rate_limit['reset_date'] - datetime.now()).total_seconds()
+        self.__rate_limit['time_left'] = (self.__rate_limit['reset_date'] - arrow.utcnow()).total_seconds()
         return self.__rate_limit
 
     def __init__(self):
@@ -79,7 +79,7 @@ class GitHubHeartbeat():
                 self.queue.put((priority_uncached, path))
             # only queue items as user_requested once during the life of the server
             elif user_requested and self.queued[path] > priority_user_requested:
-                if item.github_data and (datetime.now() - item.github_data.fetched).total_seconds() > stale_threshold:
+                if item.github_data and (arrow.utcnow() - item.github_data.fetched).total_seconds() > stale_threshold:
                     print('Queueing user requested priority for url:', path)
                     self.queued[path] = priority_user_requested
                     self.queue.put((priority_user_requested, path))
@@ -163,7 +163,7 @@ class GitHubHeartbeat():
 
             data = response.json()
 
-            cache.fetched = datetime.now()
+            cache.fetched = arrow.utcnow().datetime
             cache.json = json.dumps(data)
             cache.save()
 
@@ -182,11 +182,11 @@ class GitHubHeartbeat():
             language, was_created = ProgrammingLanguage.objects.get_or_create(name=data['language'])
 
             try:
-                last_commit_date = datetime.fromtimestamp(data['pushed_at'])
+                last_commit_date = arrow.get(data['pushed_at']).datetime
             except:
                 last_commit_date = None
 
-            cache.fetched = datetime.now()
+            cache.fetched = arrow.utcnow().datetime
             cache.json = json.dumps(data)
             cache.open_issues_count = data['open_issues_count']
             cache.stargazers_count = data['stargazers_count']
