@@ -1,10 +1,12 @@
 var gulp = require('gulp');
 var config = require('./config.secret.json');
 
+var frontendDir = './search-frontend';
+
 gulp.task('default', function(done) {
-    require('./frontend/gulpfile.js')({
+    require(frontendDir + '/gulpfile.js')({
         config: config,
-        source: './frontend',
+        source: frontendDir,
         dest: './static/search',
         glob: {
             html: 'templates/search/index.htmldjango',

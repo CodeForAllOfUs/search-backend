@@ -15,12 +15,12 @@ class Command(BaseCommand):
             orgs_json = json.load(open(os.path.join(
                 os.path.dirname(__file__),
                 '../..',
-                'frontend/organizations.json')
+                'search-frontend/organizations.json')
             ))
             projects_json = json.load(open(os.path.join(
                 os.path.dirname(__file__),
                 '../..',
-                'frontend/projects.json')
+                'search-frontend/projects.json')
             ))
             json_loader.fill_auxiliary(
                 manager=models.Category,

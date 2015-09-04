@@ -28,6 +28,5 @@ Session.vim
 *.sqlite3
 
 # this project
-frontend
 static
 admin.py
