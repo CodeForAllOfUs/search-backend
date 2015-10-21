@@ -12,6 +12,11 @@ from .models import Organization, Project, GitHubOrganizationCache, GitHubProjec
 # tasks are popped from the queue in insertion order
 counter = itertools.count()
 
+class DaemonTimer(Timer):
+    def __init__(self, *args, **kwargs):
+        Timer.__init__(self, *args, **kwargs)
+        self.daemon = True
+
 class GitHubHeartbeat():
     priority_uncached = 0
     priority_user_requested = 10
@@ -103,7 +108,7 @@ class GitHubHeartbeat():
         self.queue_items(orgs)
         self.queue_items(projects)
 
-        self.check_database_timer = Timer(self.interval_check_database, self.check_database)
+        self.check_database_timer = DaemonTimer(self.interval_check_database, self.check_database)
         self.check_database_timer.start()
 
     class Downloader(Thread):
@@ -112,7 +117,7 @@ class GitHubHeartbeat():
         headers = {'accept': 'application/vnd.github.v3+json'}
 
         def __init__(self, heartbeat, github_path, priority, *args, **kwargs):
-            Thread.__init__(self, *args, **kwargs)
+            Thread.__init__(self, *args, daemon=True, **kwargs)
             self.heartbeat = heartbeat
             self.github_path = github_path
             self.priority = priority
@@ -239,7 +244,7 @@ class GitHubHeartbeat():
             else:
                 interval = self.interval_normal
 
-        self.fetch_timer = Timer(interval, self.fetch_next)
+        self.fetch_timer = DaemonTimer(interval, self.fetch_next)
         self.fetch_timer.start()
 
     def start(self):
@@ -247,9 +252,9 @@ class GitHubHeartbeat():
         self.check_database()
 
         # start queue threads
-        self.check_database_timer = Timer(self.interval_check_database, self.check_database)
+        self.check_database_timer = DaemonTimer(self.interval_check_database, self.check_database)
         self.check_database_timer.start()
-        self.fetch_timer = Timer(1, self.fetch_next)
+        self.fetch_timer = DaemonTimer(1, self.fetch_next)
         self.fetch_timer.start()
 
     def stop(self):
