@@ -58,6 +58,7 @@ class Organization(models.Model):
     description = models.TextField()
     homepage = models.URLField(max_length=255)
     categories = models.ManyToManyField(Category)
+    # @TODO: this is data duplication with github_data.github_path
     github_path = models.CharField(max_length=255, unique=True, blank=False, null=True)
     github_data = models.ForeignKey(GitHubOrganizationCache, null=True)
 
@@ -91,6 +92,7 @@ class Project(models.Model):
     license = models.ForeignKey(License)
     organization = models.ForeignKey(Organization, null=True)
     tags = models.ManyToManyField(Tag)
+    # @TODO: this is data duplication with github_data.github_path
     github_path = models.CharField(max_length=255, unique=True, blank=False, null=True)
     github_data = models.ForeignKey(GitHubProjectCache, null=True)
 

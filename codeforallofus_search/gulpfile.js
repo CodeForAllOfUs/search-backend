@@ -7,9 +7,9 @@ gulp.task('default', function(done) {
     require(frontendDir + '/gulpfile.js')({
         config: config,
         source: frontendDir,
-        dest: './static/search',
+        dest: './static/codeforallofus_search',
         glob: {
-            html: 'templates/search/index.htmldjango',
+            html: 'templates/codeforallofus_search/index.htmldjango',
         },
     }, done);
 });

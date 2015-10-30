@@ -16,10 +16,10 @@ class Command(BaseCommand):
         try:
             # outfile = options['save']
             call_command('dumpdata',
-                'search.GitHubOrganizationCache',
-                'search.GitHubProjectCache',
+                'codeforallofus_search.GitHubOrganizationCache',
+                'codeforallofus_search.GitHubProjectCache',
                 # GitHubProjectCache depends on ProgrammingLanguage
-                'search.ProgrammingLanguage',
+                'codeforallofus_search.ProgrammingLanguage',
                 '--indent', '4')
         except:
             raise CommandError('Unable to dump GitHub cache data.')

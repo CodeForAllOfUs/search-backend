@@ -16,7 +16,7 @@ def index(request):
     except:
         context = {}
 
-    return render(request, 'search/index.htmldjango', context)
+    return render(request, 'codeforallofus_search/index.htmldjango', context)
 
 # in Django 1.9, @never_cache will work reliably
 @cache_control(max_age=0, no_cache=True, no_store=True, must_revalidate=True)

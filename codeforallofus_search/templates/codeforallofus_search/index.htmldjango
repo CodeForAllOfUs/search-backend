@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Code for all of us!</title>
-        <link rel="stylesheet" href="{% static 'search/styles/main.css' %}" />
+        <link rel="stylesheet" href="{% static 'codeforallofus_search/styles/main.css' %}" />
     </head>
     <body>
         <div id="intro">
@@ -71,8 +71,8 @@
                 <div class="empty-list-msg">There were no projects that matched your search.</div>
             </section>
         </section>
-        <script src="{% static 'search/scripts/libs.js' %}" type="text/javascript" charset="utf-8"></script>
-        <script src="{% static 'search/scripts/app.js' %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static 'codeforallofus_search/scripts/libs.js' %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static 'codeforallofus_search/scripts/app.js' %}" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript" charset="utf-8">
             require('app').start();
         </script>

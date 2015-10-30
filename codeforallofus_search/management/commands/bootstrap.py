@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand, CommandError
 
-from search import models
+from ... import models
 from . import _json_loader as json_loader
 
 class Command(BaseCommand):
