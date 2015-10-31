@@ -4,7 +4,22 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 # START decorators
-def use_drivers(self, *keys):
+def set_class_drivers(drivers, default=None, conveniences=False):
+    def modify_class(cls):
+        cls.drivers = drivers
+
+        if default:
+            default_driver = drivers.get(default)
+            cls.driver = default_driver
+
+            if conveniences:
+                cls.d = default_driver.find_element_by_id
+                cls.q = default_driver.find_elements_by_css_selector
+
+        return cls
+    return modify_class
+
+def method_use_drivers(*keys):
     return lambda func: _apply_drivers(func, *keys)
 # END decorators
 

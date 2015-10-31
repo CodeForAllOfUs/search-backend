@@ -6,12 +6,11 @@ import tests.selenium_tools as selenium_tools
 from tests.global_vars import drivers
 
 
+@selenium_tools.set_class_drivers(drivers, default='ff', conveniences=True)
 class TestHomepage(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestHomepage, cls).setUpClass()
-        cls.drivers = drivers
-        cls.driver  = drivers.get('ff')
 
     @classmethod
     def tearDownClass(cls):
@@ -20,11 +19,13 @@ class TestHomepage(StaticLiveServerTestCase):
     def setUp(self): pass
     def tearDown(self): pass
 
-    @selenium_tools.use_drivers('ff', 'ch')
+    @selenium_tools.method_use_drivers('ff', 'ch')
     def test_search_input_exists(self):
-        d = self.driver.find_elements_by_css_selector
         self.driver.get('%s%s' % (self.live_server_url, '/search/'))
 
-        searchbar = d('input#searchbar')
+        searchbar = self.d('searchbar')
+        self.assertEqual('Search', searchbar.get_attribute('placeholder'))
+
+        searchbar = self.q('input#searchbar')
         self.assertEqual(1, len(searchbar))
         self.assertEqual('Search', searchbar[0].get_attribute('placeholder'))
