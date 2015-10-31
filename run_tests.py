@@ -20,7 +20,9 @@ if __name__ == '__main__':
     test_runner = TestRunner()
     failures = test_runner.run_tests(["tests"])
 
-    if not global_vars.remote_selenium:
+    if global_vars.remote_selenium:
+        global_vars.drivers.close()
+    else:
         global_vars.display.stop()
 
     sys.exit(bool(failures))
