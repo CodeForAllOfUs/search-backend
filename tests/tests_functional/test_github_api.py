@@ -18,14 +18,14 @@ def create_question(question_text, days):
 
 class IndexViewTests(TestCase):
     def test_index_view_with_no_query_params(self):
-        response = self.client.get(reverse('search:index'))
+        response = self.client.get(reverse('codeforallofus_search:index'))
         self.assertTemplateUsed(response, 'codeforallofus_search/index.htmldjango')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<input id="searchbar" type="search" placeholder="Search" class="form-control input-lg" />', html=True)
 
     def test_index_view_with_search_query_param(self):
         context = {'query': 'test search'}
-        response = self.client.get(reverse('search:index'), context)
+        response = self.client.get(reverse('codeforallofus_search:index'), context)
         self.assertTemplateUsed(response, 'codeforallofus_search/index.htmldjango')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['search_query'], context['query'])

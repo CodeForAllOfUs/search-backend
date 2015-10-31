@@ -16,5 +16,5 @@ Including another URLconf
 from django.conf.urls import include, url
 
 urlpatterns = [
-    url(r'^search/', include('codeforallofus_search.urls', namespace='search')),
+    url(r'^search/', include('codeforallofus_search.urls', namespace='codeforallofus_search')),
 ]
