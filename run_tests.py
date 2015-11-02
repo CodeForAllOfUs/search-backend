@@ -10,9 +10,7 @@ import tests.global_vars as global_vars
 from tools.net_tools import get_network_ip
 
 
-SERVER_PORT = int(os.environ.get('PORT', 9000))
-
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '{ip}:{port}'.format(ip=get_network_ip(), port=SERVER_PORT)
+os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '{ip}:{port}'.format(ip=get_network_ip(), port='9000-9100')
 
 if __name__ == '__main__':
     django.setup()
