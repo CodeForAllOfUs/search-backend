@@ -27,6 +27,8 @@ def _apply_drivers(func, *keys):
     def wrapper(ctx):
         if hasattr(ctx, 'driver'):
             old_driver = ctx.driver
+        else:
+            old_driver = None
 
         drivers = [ctx.drivers.get(key) for key in keys]
 
@@ -48,29 +50,27 @@ class SeleniumDriverHolder():
     def get(self, key):
         return self.drivers_container[key]
 
+    def get_drivers(self, key=None):
+        if key:
+            drivers = [self.get(key)]
+        else:
+            drivers = self.drivers_container.values()
+
+        return drivers
+
     def close(self, key=None):
         '''
         Close the browser window in all drivers.
         Note this is *not* the same as quitting the drivers.
         '''
-        if key:
-            drivers = [self.drivers_container[key]]
-        else:
-            drivers = self.drivers_container.values()
-
-        for driver in drivers:
+        for driver in self.get_drivers(key):
             driver.close()
 
     def quit(self, key=None):
         '''
         Quit all drivers and free their slots on the Selenium remote node.
         '''
-        if key:
-            drivers = [self.drivers_container[key]]
-        else:
-            drivers = self.drivers_container.values()
-
-        for driver in drivers:
+        for driver in self.get_drivers(key):
             driver.quit()
 
     def add_firefox(self, key, remote=True, **desired_capabilities):
