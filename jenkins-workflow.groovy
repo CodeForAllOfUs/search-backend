@@ -14,11 +14,11 @@ node {
 
     // avoid long npm and bower install times
     dir(backendDir + '/' + frontendDir) {
-        sh 'npm install'
-        sh 'bower install'
+        // sh 'npm install'
+        // sh 'bower install'
     }
     dir(backendDir) {
-        sh 'npm install'
+        // sh 'npm install'
         sh 'gulp build'
     }
 
