@@ -7,8 +7,11 @@ built
 public
 .tmp
 .sass-cache
-coverage
 *.secret.json
+coverage
+.coverage
+coverage.xml
+htmlcov
 
 # vim-related
 [._]*.s[a-w][a-z]
