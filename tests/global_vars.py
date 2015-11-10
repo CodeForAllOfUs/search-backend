@@ -4,6 +4,7 @@ from pyvirtualdisplay import Display
 
 if os.environ.get('REMOTE_SELENIUM') == 'True':
     remote_selenium = True
+    display = None
     grid_url = os.environ['REMOTE_SELENIUM_URL']
     drivers = selenium_tools.SeleniumDriverHolder(grid_url=grid_url)
 else:
@@ -14,6 +15,3 @@ else:
     display = Display(visible=0, size=(800, 600))
     display.start()
     drivers = selenium_tools.SeleniumDriverHolder()
-
-drivers.add_firefox('ff', remote=remote_selenium, platform='LINUX')
-drivers.add_chrome('ch',  remote=remote_selenium, platform='LINUX')

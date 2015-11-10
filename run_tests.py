@@ -8,10 +8,11 @@ import django
 from django.conf import settings
 from django.test.utils import get_runner
 
-import tests.global_vars as global_vars
+from tests.global_vars import drivers, display, remote_selenium
 from tools.net_tools import get_network_ip
 
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.test_settings')
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '{ip}:{port}'.format(ip=get_network_ip(), port='9000-9100')
 
 def parse_args():
@@ -36,9 +37,13 @@ def parse_args():
             dest='acceptance',
             choices=bool_choices,
             nargs='?', const='yes', default='no',
-            help='Add selenium tests to the run queue.'
+            help='Add Selenium tests to the run queue.'
     )
     return parser.parse_args()
+
+def add_selenium_drivers():
+    drivers.add_firefox('ff', remote=remote_selenium, platform='LINUX')
+    drivers.add_chrome('ch',  remote=remote_selenium, platform='LINUX')
 
 def main():
     args = parse_args()
@@ -46,6 +51,8 @@ def main():
 
     for test_type in ['unit', 'functional', 'acceptance']:
         if getattr(args, test_type) == 'yes':
+            if test_type == 'acceptance':
+                add_selenium_drivers()
             test_labels.append('tests.tests_{}'.format(test_type))
 
     if not test_labels:
@@ -57,11 +64,9 @@ def main():
     test_runner = TestRunner()
     failures = test_runner.run_tests(test_labels)
 
-    global_vars.drivers.close()
-
-    if not global_vars.remote_selenium:
-        global_vars.display.stop()
-
+    if display:
+        display.stop()
+    drivers.quit()
     sys.exit(bool(failures))
 
 if __name__ == '__main__':
